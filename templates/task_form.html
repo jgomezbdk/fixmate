@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>{{ task and 'Edit Task' or 'Add New Task' }}</h2>
+  <form method="post">
+    {% set t = task or {} %}
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input id="title" name="title" class="form-control" required
+             value="{{ t.title or '' }}">
+    </div>
+    <div class="form-group">
+      <label for="category">Category</label>
+      <input id="category" name="category" class="form-control"
+             value="{{ t.category or '' }}">
+    </div>
+    <div class="form-group">
+      <label for="due_date">Due Date</label>
+      <input id="due_date" type="date" name="due_date" class="form-control"
+             value="{{ t.due_date or '' }}">
+    </div>
+    <div class="form-group">
+      <label for="frequency">Frequency</label>
+      <input id="frequency" name="frequency" class="form-control"
+             placeholder="e.g., Monthly" value="{{ t.frequency or '' }}">
+    </div>
+    <div class="form-group">
+      <label for="cost">Cost ($)</label>
+      <input id="cost" type="number" step="0.01" name="cost" class="form-control"
+             value="{{ t.cost or '' }}">
+    </div>
+    <div class="form-group">
+      <label for="guide">Repair Guide (text or URL)</label>
+      <textarea id="guide" name="guide" class="form-control" rows="3">{{ t.guide or '' }}</textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">Save Task</button>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+  </form>
+{% endblock %}

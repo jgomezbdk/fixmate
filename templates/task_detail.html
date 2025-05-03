@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Task Details</h2>
+  <p><strong>Title:</strong> {{ task.title }}</p>
+  <p><strong>Category:</strong> {{ task.category }}</p>
+  <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+  <p><strong>Frequency:</strong> {{ task.frequency }}</p>
+  <p><strong>Cost:</strong> ${{ "%.2f"|format(task.cost) }}</p>
+  <p><strong>Completed:</strong> {{ 'Yes' if task.is_completed else 'No' }}</p>
+  <h4>Repair Guide:</h4>
+  {% if task.guide %}
+    {% if task.guide.startswith('http') %}
+      <p><a href="{{ task.guide }}" target="_blank">{{ task.guide }}</a></p>
+    {% else %}
+      <p>{{ task.guide }}</p>
+    {% endif %}
+  {% else %}
+    <p><em>No guide provided.</em></p>
+  {% endif %}
+  <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+  <a href="{{ url_for('edit_task', id=task.id) }}" class="btn btn-primary mt-3">Edit Task</a>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Completed Tasks</h2>
+  <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mb-3">Back to Dashboard</a>
+  {% if tasks %}
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Due Date</th>
+          <th>Cost</th>
+          <th>Guide</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in tasks %}
+          <tr>
+            <td>{{ t.title }}</td>
+            <td>{{ t.due_date }}</td>
+            <td>${{ "%.2f"|format(t.cost) }}</td>
+            <td>
+              {% if t.guide.startswith('http') %}
+                <a href="{{ t.guide }}" target="_blank">View</a>
+              {% else %}
+                {{ t.guide }}
+              {% endif %}
+            </td>
+            <td>
+              <form method="post" action="{{ url_for('delete_task', id=t.id) }}">
+                <button class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No completed tasks yet.</p>
+  {% endif %}
+{% endblock %}
