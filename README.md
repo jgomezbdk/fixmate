@@ -24,11 +24,9 @@ pip (Python package installer) available.
 Git for cloning the repository.
 
 ⚡ Installation & Setup
-Clone the Repository:
+Clone the Repository: git clone https://github.com/jgomezbdk/fixmate.git 
 
-# Replace 'yourusername' with the actual GitHub username
-git clone https://github.com/yourusername/fixmate.git
-cd fixmate
+cd fixmate 
 
 Create and Activate Virtual Environment:
 (Recommended to isolate project dependencies)
@@ -110,21 +108,41 @@ streamlit run analytics_dashboard.py
 Access the Streamlit dashboard in your browser, usually at http://localhost:8501. The link within the main Flask app will direct you here with the correct user ID parameter.
 
 📁 Project Structure
-fixmate/
-├── app.py                  # Main Flask application logic, routes, DB setup
-├── analytics_dashboard.py  # Optional: Streamlit analytics application
-├── requirements.txt        # Python dependencies for pip
-├── fixmate.db              # SQLite database file (created by init-db)
-├── templates/              # Jinja2 HTML templates
-│   ├── base.html           # Base layout (navbar, footer, etc.)
-│   ├── dashboard.html      # User's main task view
-│   ├── login.html          # Login form
-│   ├── register.html       # Registration form
-│   ├── task_form.html      # Form for adding/editing tasks
-│   ├── task_detail.html    # View details of a single task
-│   └── analytics.html      # Simple task counts page (Flask)
-└── static/                 # Static assets (CSS, JS, Images)
-    └── custom.css          # Custom CSS rules
+fixmate/ (Root Project Folder)
+
+app.py - Main Flask application logic, routes, DB setup
+
+analytics_dashboard.py - Optional: Streamlit analytics application
+
+requirements.txt - Python dependencies for pip
+
+fixmate.db - SQLite database file (created by flask init-db)
+
+templates/ - Jinja2 HTML templates folder
+
+base.html - Base layout (navbar, footer, etc.)
+
+dashboard.html - User's main task view
+
+login.html - Login form
+
+register.html - Registration form
+
+task_form.html - Form for adding/editing tasks
+
+task_detail.html - View details of a single task
+
+analytics.html - Simple task counts page (Flask)
+
+static/ - Static assets folder (CSS, JS, Images)
+
+custom.css - Custom CSS rules
+
+venv/ - Python virtual environment folder (usually excluded from Git)
+
+.gitignore - (Recommended) Specifies intentionally untracked files Git should ignore
+
+README.md - This file
 
 🤝 Contributing
 Contributions are welcome! Please follow these steps:
