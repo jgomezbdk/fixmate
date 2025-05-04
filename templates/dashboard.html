@@ -1,41 +1,123 @@
 {% extends "base.html" %}
-{% block content %}
-  <h2>Your Maintenance Tasks</h2>
-  <a href="{{ url_for('add_task') }}" class="btn btn-success mb-3">Add New Task</a>
-  {% if tasks %}
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Due Date</th>
-          <th>Frequency</th>
-          <th>Cost</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for t in tasks %}
-          <tr>
-            <td>{{ t.title }}</td>
-            <td>{{ t.due_date }}</td>
-            <td>{{ t.frequency }}</td>
-            <td>${{ "%.2f"|format(t.cost) }}</td>
-            <td>
-              <a href="{{ url_for('task_detail', id=t.id) }}" class="btn btn-sm btn-info">View</a>
-              <a href="{{ url_for('edit_task', id=t.id) }}" class="btn btn-sm btn-primary">Edit</a>
-              <form method="post" action="{{ url_for('complete_task', id=t.id) }}" style="display:inline">
-                <button class="btn btn-sm btn-success">Complete</button>
-              </form>
-              <form method="post" action="{{ url_for('delete_task', id=t.id) }}" style="display:inline">
-                <button class="btn btn-sm btn-danger">Delete</button>
-              </form>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No tasks yet. Click “Add New Task” to create one.</p>
-  {% endif %}
-{% endblock %}
 
+{% block title %}Dashboard - FixMate{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    {# --- Heading changes based on view --- #}
+    {% if current_view == 'incomplete' %}
+        <h1 class="mb-0">Tasks</h1> {# Renamed from Incomplete Tasks #}
+    {% elif current_view == 'completed' %}
+        <h1 class="mb-0">Completed Tasks</h1>
+    {% endif %}
+
+    {# --- View Toggle Buttons (Top Right) --- #}
+    <div class="btn-group" role="group" aria-label="Task view toggle">
+        {# Button to show Tasks (incomplete) #}
+        <a href="{{ url_for('dashboard') }}" {# No view parameter needed for default 'incomplete' #}
+           class="btn {% if current_view == 'incomplete' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+           Tasks
+        </a>
+        {# Button to show Completed tasks #}
+        <a href="{{ url_for('dashboard', view='completed') }}" {# Adds ?view=completed to URL #}
+           class="btn {% if current_view == 'completed' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+           Completed
+        </a>
+    </div>
+</div>
+
+{# --- Add Task Button (Only show when viewing 'Tasks') --- #}
+{% if current_view == 'incomplete' %}
+<div class="mb-4">
+     <a href="{{ url_for('add_task') }}" class="btn btn-success">
+         Add New Task
+     </a>
+     {# Consider adding Bootstrap Icons if you want fancier buttons:
+        In base.html <head>: <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+        Then use <i class="bi bi-plus-lg"></i> inside the button text
+     #}
+</div>
+{% endif %}
+
+
+{# =============================================== #}
+{# --- Conditionally display the correct list --- #}
+{# =============================================== #}
+
+{# --- TASKS (INCOMPLETE) VIEW --- #}
+{% if current_view == 'incomplete' %}
+    {% if not incomplete_tasks %}
+    <div class="alert alert-info" role="alert">
+        You have no pending tasks. Add one now!
+    </div>
+    {% else %}
+    {# --- Task List --- #}
+    <ul class="list-group">
+        {% for task in incomplete_tasks %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {# Task Title and Details #}
+            <div>
+                <a href="{{ url_for('task_detail', id=task.id) }}" class="fw-bold text-decoration-none">{{ task.title }}</a>
+                <small class="d-block text-muted">
+                    {% if task.category %}Category: {{ task.category }} | {% endif %}
+                    {% if task.due_date %}Due: {{ task.due_date }} {% endif %}
+                    {# Add other small details if needed, e.g., estimated_time #}
+                </small>
+            </div>
+            {# Action Buttons #}
+            <div class="btn-group" role="group" aria-label="Task actions for {{ task.title }}">
+                {# Complete Button Form #}
+                <form action="{{ url_for('complete_task', id=task.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-success" title="Mark as Complete">✓</button>
+                </form>
+                {# Edit Button #}
+                <a href="{{ url_for('edit_task', id=task.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit">Edit</a>
+                 {# Delete Button Form #}
+                 <form action="{{ url_for('delete_task', id=task.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this task?');">X</button>
+                </form>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %} {# End task list check #}
+{% endif %} {# === End of incomplete view === #}
+
+
+{# --- COMPLETED TASKS VIEW --- #}
+{% if current_view == 'completed' %}
+    {% if not completed_tasks %}
+        <div class="alert alert-info" role="alert">
+            You have not completed any tasks yet.
+        </div>
+    {% else %}
+        {# --- Completed Task List --- #}
+        <ul class="list-group">
+            {% for task in completed_tasks %}
+                <li class="list-group-item d-flex justify-content-between align-items-center text-muted">
+                     {# Completed Task Title and Details #}
+                     <div>
+                        <span class="text-decoration-line-through">{{ task.title }}</span>
+                        {# Optionally show completion date if you store it #}
+                        <small class="d-block text-muted">
+                            {% if task.category %}Category: {{ task.category }}{% endif %}
+                        </small>
+                    </div>
+                    {# Completed Task Actions #}
+                    <div class="btn-group" role="group" aria-label="Completed task actions for {{ task.title }}">
+                        {# Uncomplete Button Form #}
+                        <form action="{{ url_for('uncomplete_task', id=task.id) }}" method="POST" class="d-inline">
+                             <button type="submit" class="btn btn-sm btn-outline-warning" title="Mark as Incomplete">↺</button>
+                        </form>
+                        {# Delete Button Form #}
+                        <form action="{{ url_for('delete_task', id=task.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this completed task?');">X</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %} {# End completed task list check #}
+{% endif %} {# === End of completed view === #}
+
+{% endblock %}

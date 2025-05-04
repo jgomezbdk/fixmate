@@ -1,16 +1,12 @@
-# init_db.py
 import sqlite3
 
-DB = 'fixmate.db'
-SCHEMA = 'schema.sql'
-
 def init_db():
-    with open(SCHEMA, 'r') as f:
-        sql = f.read()
-    conn = sqlite3.connect(DB)
-    conn.executescript(sql)
+    conn = sqlite3.connect('fixmate.db')
+    with open('schema.sql', 'r') as f:
+        conn.executescript(f.read())
+    conn.commit()
     conn.close()
-    print(f"Initialized {DB} from {SCHEMA}")
+    print("✔ Initialized fixmate.db")
 
 if __name__ == '__main__':
     init_db()

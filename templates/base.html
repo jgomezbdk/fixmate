@@ -1,33 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>FixMate</title>
-  <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}FixMate{% endblock %}</title> {# Allows child templates to set specific titles #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}" /> {# Your custom CSS #}
+    {# Link to Bootstrap CSS (CDN) #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+    {# Optional: Link to Bootstrap Icons (if you use them) #}
+    {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"> #}
+    <style>
+        /* Optional CSS to help footer stay at bottom */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .container.py-4 { /* Target the main content container */
+            flex: 1;
+        }
+    </style>
 </head>
 <body>
-  <nav class="navbar navbar-light bg-light">
-    <a class="navbar-brand" href="{{ url_for('dashboard') }}">FixMate</a>
-    <ul class="nav">
-      {% if session.username %}
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('completed') }}">Completed</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
-      {% else %}
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
-      {% endif %}
-    </ul>
-  </nav>
-  <div class="container mt-4">
-    {% with msgs = get_flashed_messages(with_categories=true) %}
-      {% for category, message in msgs %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-      {% endfor %}
+{# --- Navbar Start --- #}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        {# Brand Name Link #}
+        <a class="navbar-brand" href="{{ url_for('home') }}">FixMate</a>
+        {# Mobile Navbar Toggle Button #}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        {# Collapsible Navbar Content #}
+        <div class="collapse navbar-collapse" id="navbarNav">
+            {# Links move to the left because ms-auto was removed #}
+            <ul class="navbar-nav"> {# Removed ms-auto to keep links left #}
+                {% if session.get('user') %}
+                    {# --- Links shown ONLY when user is logged in --- #}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}"
+                           href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+                    {# --- Renamed Link to Flask Analytics Page --- #}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'analytics' %}active{% endif %}"
+                           href="{{ url_for('analytics') }}">Task Counts</a>
+                    </li>
+                    {# --- ADDED Link to Streamlit Dashboard --- #}
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           {# Points to default Streamlit port and passes user ID #}
+                           href="http://localhost:8501/?user_id={{ session.user.id }}"
+                           target="_blank"> {# Opens Streamlit in a new tab #}
+                           Analytics Dashboard ✨ {# Link text #}
+                        </a>
+                    </li>
+                    {# --- End of Streamlit Link --- #}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout ({{ session.user.username }})</a>
+                    </li>
+                {% else %}
+                    {# --- Links shown ONLY when user is logged out --- #}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'login' %}active{% endif %}"
+                           href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'register' %}active{% endif %}"
+                           href="{{ url_for('register') }}">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div> {# End collapse #}
+    </div> {# End container-fluid #}
+</nav>
+{# --- Navbar End --- #}
+
+{# --- Main Content Area --- #}
+<div class="container py-4"> {# Padding top/bottom #}
+
+    {# --- Flash message display section --- #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category or 'info' }} alert-dismissible fade show mt-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
     {% endwith %}
+    {# --- End of flash message section --- #}
+
+    {# --- Content block for child templates --- #}
     {% block content %}{% endblock %}
-  </div>
+    {# --- End of content block --- #}
+
+</div> {# End main content container #}
+
+{# --- Footer --- #}
+<footer class="mt-auto py-3 bg-light text-center"> {# Pushes footer down if content is short #}
+    <div class="container">
+        <span class="text-muted">FixMate &copy; {{ now.year }}</span> {# Corrected year display #}
+    </div>
+</footer>
+{# --- End Footer --- #}
+
+{# --- JavaScript --- #}
+{# Bootstrap Bundle JS (includes Popper) - Place at end of body #}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{# Optional block for page-specific JavaScript files #}
+{% block scripts %}{% endblock %}
+{# --- End JavaScript --- #}
+
 </body>
 </html>

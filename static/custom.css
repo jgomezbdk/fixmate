@@ -1,7 +1,3 @@
 /* static/custom.css */
-body {
-  padding-top: 70px;   /* ensure content clears the navbar */
-}
-.container {
-  max-width: 800px;    /* constrain width for readability */
-}
+body { padding-top: 0px; }
+.container { max-width: 800px; }

@@ -1,13 +1,18 @@
+<!-- templates/task_detail.html -->
 {% extends "base.html" %}
 {% block content %}
   <h2>Task Details</h2>
   <p><strong>Title:</strong> {{ task.title }}</p>
-  <p><strong>Category:</strong> {{ task.category }}</p>
-  <p><strong>Due Date:</strong> {{ task.due_date }}</p>
-  <p><strong>Frequency:</strong> {{ task.frequency }}</p>
-  <p><strong>Cost:</strong> ${{ "%.2f"|format(task.cost) }}</p>
-  <p><strong>Completed:</strong> {{ 'Yes' if task.is_completed else 'No' }}</p>
-  <h4>Repair Guide:</h4>
+  <p><strong>Category:</strong> {{ task.category or '—' }}</p>
+  <p><strong>Due Date:</strong> {{ task.due_date or '—' }}</p>
+  <p><strong>Frequency:</strong> {{ task.frequency or '—' }}</p>
+  <p><strong>Cost:</strong>
+    {% if task.cost is not none %}${{ '%.2f'|format(task.cost) }}{% else %}—{% endif %}
+  </p>
+  <p><strong>Estimated Time:</strong> {{ task.estimated_time or '—' }}</p>
+  <p><strong>Completed:</strong> {{ 'Yes' if task.completed else 'No' }}</p>
+
+  <h4>Repair Guide</h4>
   {% if task.guide %}
     {% if task.guide.startswith('http') %}
       <p><a href="{{ task.guide }}" target="_blank">{{ task.guide }}</a></p>
@@ -17,6 +22,38 @@
   {% else %}
     <p><em>No guide provided.</em></p>
   {% endif %}
-  <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
-  <a href="{{ url_for('edit_task', id=task.id) }}" class="btn btn-primary mt-3">Edit Task</a>
+
+  {# Determine which URL to use for video: prefer the dedicated video_url, otherwise the guide if it’s a URL #}
+  {% set video_link = task.video_url or (task.guide if task.guide and task.guide.startswith('http') else None) %}
+
+  {% if video_link %}
+    <h4>Video</h4>
+    {% set vid_id = video_link.split('v=')[-1].split('&')[0] %}
+    <iframe width="560" height="315"
+            src="https://www.youtube.com/embed/{{ vid_id }}"
+            frameborder="0" allowfullscreen>
+    </iframe>
+    <p><a href="{{ video_link }}" target="_blank">Watch on YouTube</a></p>
+  {% endif %}
+
+  {# Only show “No video found” and Search button if there is no usable URL #}
+  {% if not video_link %}
+    <h4>Video</h4>
+    <p><em>No preset video found</em></p>
+    <button id="search_video" class="btn btn-warning mb-3">
+      🔍 Search YouTube for “How to {{ task.title }}”
+    </button>
+  {% endif %}
+
+  <div class="mt-3">
+    <a href="{{ url_for('edit_task', id=task.id) }}" class="btn btn-primary">Edit Task</a>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+  </div>
+
+  <script>
+    document.getElementById('search_video')?.addEventListener('click', () => {
+      const query = encodeURIComponent('How to ' + {{ task.title|tojson }});
+      window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank');
+    });
+  </script>
 {% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %} {# Uses your existing base layout #}
+
+{% block title %}Analytics - FixMate{% endblock %} {# Sets the browser tab title #}
+
+{% block content %}
+    {# Main heading for the page #}
+    <h1>Task Analytics</h1>
+    <hr> {# Adds a horizontal line #}
+
+    {# Display the counts passed from app.py #}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Task Summary</h5>
+            <p class="card-text">
+                Total number of tasks created: <strong>{{ total }}</strong>
+            </p>
+            <p class="card-text">
+                Number of tasks completed: <strong>{{ done }}</strong>
+            </p>
+
+            {# Calculate and display pending tasks #}
+            <p class="card-text">
+                Number of tasks pending: <strong>{{ total - done }}</strong>
+            </p>
+
+            {# Calculate and display percentage completed, handling division by zero #}
+            {% if total > 0 %}
+                {# Calculates percentage, formats to 1 decimal place #}
+                <p class="card-text">
+                    Percentage completed: <strong>{{ "%.1f"|format((done / total) * 100) }}%</strong>
+                </p>
+            {% else %}
+                {# Shows N/A if there are no tasks to avoid errors #}
+                <p class="card-text">
+                    Percentage completed: N/A (No tasks created)
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    {# You can add more charts or details below here later if desired #}
+
+{% endblock %}

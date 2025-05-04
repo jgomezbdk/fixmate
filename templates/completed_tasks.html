@@ -9,6 +9,7 @@
           <th>Title</th>
           <th>Due Date</th>
           <th>Cost</th>
+          <th>Time</th>
           <th>Guide</th>
           <th>Delete</th>
         </tr>
@@ -19,6 +20,7 @@
             <td>{{ t.title }}</td>
             <td>{{ t.due_date }}</td>
             <td>${{ "%.2f"|format(t.cost) }}</td>
+            <td>{{ t.estimated_time }}</td>
             <td>
               {% if t.guide.startswith('http') %}
                 <a href="{{ t.guide }}" target="_blank">View</a>

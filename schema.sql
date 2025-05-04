@@ -1,22 +1,22 @@
--- schema.sql
+PRAGMA foreign_keys = ON;
 
--- Table: users
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL
+CREATE TABLE users (
+  id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT    NOT NULL UNIQUE,
+  password TEXT    NOT NULL
 );
 
--- Table: tasks
-CREATE TABLE IF NOT EXISTS tasks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    title TEXT NOT NULL,
-    category TEXT,
-    due_date TEXT,
-    frequency TEXT,
-    cost REAL,
-    is_completed INTEGER NOT NULL DEFAULT 0,
-    guide TEXT,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+CREATE TABLE tasks (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id        INTEGER NOT NULL,
+  title          TEXT    NOT NULL,
+  category       TEXT,
+  due_date       TEXT,
+  frequency      TEXT,
+  cost           REAL,
+  estimated_time TEXT,
+  guide          TEXT,
+  video_url      TEXT,
+  completed      INTEGER NOT NULL DEFAULT 0,
+  FOREIGN KEY(user_id) REFERENCES users(id)
 );
